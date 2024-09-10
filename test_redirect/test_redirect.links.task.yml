@@ -1,0 +1,47 @@
+# test redirect routing definition
+entity.test_redirect.canonical:
+  route_name: entity.test_redirect.canonical
+  base_route: entity.test_redirect.canonical
+  title: 'View'
+
+entity.test_redirect.edit_form:
+  route_name: entity.test_redirect.edit_form
+  base_route: entity.test_redirect.canonical
+  title: 'Edit'
+
+entity.test_redirect.version_history:
+  route_name: entity.test_redirect.version_history
+  base_route: entity.test_redirect.canonical
+  title: 'Revisions'
+  defaults:
+    _title: 'Revisions'
+    _controller: '\Drupal\test_redirect\Controller\testRedirectController::revisionOverview'
+
+entity.test_redirect.delete_form:
+  route_name:  entity.test_redirect.delete_form
+  base_route:  entity.test_redirect.canonical
+  title: Delete
+  weight: 10
+
+# test log routing definition
+entity.test_log.canonical:
+  route_name: entity.test_log.canonical
+  base_route: entity.test_log.canonical
+  title: 'View'
+
+entity.test_log.delete_form:
+  route_name:  entity.test_log.delete_form
+  base_route:  entity.test_log.canonical
+  title: Delete
+  weight: 10
+
+# test custom local tsaks
+entity.test_redirect.list: # The first plugin ID
+  route_name: view.test_redirect_statistics.page_1
+  title: 'Redirects'
+  base_route: view.test_redirect_statistics.page_1
+
+entity.test_log.collection: # The first plugin ID
+  route_name: entity.test_log.collection
+  title: 'Log'
+  base_route: view.test_redirect_statistics.page_1

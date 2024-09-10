@@ -1,0 +1,337 @@
+<?php
+
+/**
+ * @file
+ * Contains test_redirect.module.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Drupal\redirect\Entity\TestRedirect;
+use Drupal\redirect\Entity\TestLog;
+use Drupal\Core\Render\Element;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_help().
+ */
+function test_redirect_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the test_redirect module.
+    case 'help.page.test_redirect':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Test Redirect Module') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * $code contains the selected status_code.
+ *
+ * @param $code
+ *   Status code
+ */
+function test_redirect_status_code_options($code = NULL) {
+  $codes = [
+    301 => t('301 Moved Permanently'),
+    302 => t('302 Found'),
+    303 => t('303 See Other'),
+    307 => t('307 Temporary Redirect'),
+  ];
+  return isset($codes[$code]) ? $codes[$code] : $codes;
+}
+
+/**
+ * Implements hook_entity_delete().
+ *
+ * Will delete redirects based on the entity URL.
+ */
+function test_redirect_entity_delete(EntityInterface $entity) {
+  if ($entity->bundle() == 'test_redirect') {
+    $test_log = _test_redirect_get_log($entity);
+    if (!empty($test_log)) {
+      $test_log->delete();
+    }
+  }
+  else {
+    try {
+      if ($entity->getEntityType()->hasLinkTemplate('canonical') && $entity->toUrl('canonical')->isRouted()) {
+        $entity_path = $entity->toUrl('canonical')->getInternalPath();
+        _test_redirect_delete_by_path($entity_path);
+      }
+    }
+    catch (RouteNotFoundException $e) {
+      // This can happen if a module incorrectly defines a link template, ignore
+      // such errors.
+    }
+  }
+}
+
+/**
+ * Load referenced test_log entity from test_redirect entity.
+ *
+ */
+function _test_redirect_get_log(EntityInterface $test_redirect) {
+  if ($test_redirect->bundle() == 'test_redirect') {
+    $test_log_id = $test_redirect->getLog();
+
+    if (!empty($test_log_id)) {
+      $entity_type = 'test_log';
+      $test_log = \Drupal::entityTypeManager()->getStorage($entity_type)->load($test_log_id);
+      if (!empty($test_log)) {
+        return $test_log;
+      }
+    }
+  }
+  return;
+}
+
+/**
+ * Delete any test_redirects associated with a path or any of its sub-paths.
+ *
+ * @param string $path
+ *   An string with an internal Drupal path.
+ *
+ * @ingroup test_redirect
+ */
+function _test_redirect_delete_by_path($path) {
+  $entity_type = 'test_redirect';
+  $query = \Drupal::entityQuery($entity_type);
+
+  $group = $query->orConditionGroup();
+  $query->accessCheck();
+  $group->condition('test_redirect_source', $path, 'CONTAINS');
+  $group->condition('test_redirect_redirect', $path, 'CONTAINS');
+  $group->condition('test_redirect_fallback', $path, 'CONTAINS');
+
+  $query->condition($group);
+  $ids = $query->execute();
+
+  $entities = \Drupal::entityTypeManager()->getStorage($entity_type)->loadMultiple($ids);
+  foreach ($entities as $entity) {
+    $entity->delete();
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function test_redirect_theme($existing, $type, $theme, $path) {
+  $theme = [
+    'test_redirect' => [
+      'path' => $path . '/templates',
+      'template'  => 'test_redirect',
+      'render element' => 'elements',
+    ],
+    'test_log' => [
+      'path' => $path . '/templates',
+      'template'  => 'test_log',
+      'render element' => 'elements',
+    ],
+  ];
+  return $theme;
+}
+
+/**
+ * Implements hook_preprocess_entity().
+ */
+function test_redirect_preprocess_test_redirect(&$variables) {
+  $entity = $variables['elements']['#test_redirect'];
+  $variables['content'] = [];
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
+}
+
+/**
+ * Implements hook_preprocess_entity().
+ */
+function test_redirect_preprocess_test_log(&$variables) {
+  $entity = $variables['elements']['#test_log'];
+
+  $header = [
+    'date' => t('Date'),
+    'type' => t('Type'),
+    'response_code' => t('Response code'),
+    'from' => t('From'),
+    'to' => t('To'),
+    'status_code' => t('Status code'),
+  ];
+  $rows = [];
+
+  if (!$entity->get('logs')->isEmpty()) {
+    foreach ($entity->logs->getValue() as $key => $value) {
+      if (!empty($value['value'])) {
+        $log = unserialize($value['value']);
+        $date = !empty($log['time']) ? \Drupal::service('date.formatter')->format($log['time'], 'custom', 'd.m.Y H:i') : '';
+        $rows[] = [
+          'date' => $date,
+          'type' => !empty($log['type']) ? $log['type'] : '',
+          'response_code' => !empty($log['response_code']) ? $log['response_code'] : '',
+          'from' => !empty($log['source']) ? $log['source'] : '',
+          'to' => !empty($log['url']) ? $log['url'] : '',
+          'status_code' => !empty($log['status_code']) ? $log['status_code'] : '',
+        ];
+      }
+    }
+  }
+
+  $build['table'] = [
+    '#type' => 'table',
+    '#header' => $header,
+    '#rows' => array_reverse($rows),
+    '#empty' => t('No redirects yet'),
+  ];
+
+  $variables['log'] = [
+    '#type' => '#markup',
+    '#markup' => \Drupal::service('renderer')->render($build),
+  ];
+}
+
+/**
+ * Implements hook_preprocess_page_title().
+ */
+function test_redirect_preprocess_page_title(&$variables) {
+  $route_name = \Drupal::routeMatch()->getRouteName();
+
+  switch ($route_name) {
+    case 'entity.test_log.collection':
+      $variables['title'] = t('Log');
+      break;
+
+    case 'entity.test_redirect.add_form':
+      $variables['title'] = t('Add URL redirect');
+      break;
+
+    case 'entity.test_redirect.edit_form':
+      $test_redirect = \Drupal::routeMatch()->getParameter('test_redirect');
+      $variables['title'] = t('Edit @source_url', ['@source_url' => $test_redirect->label()]);
+      break;
+  }
+}
+
+/**
+ * Implements hook_preprocess_views_view_table().
+ */
+function test_redirect_preprocess_views_view_table__test_redirect_statistics(&$variables) {
+  $view = $variables['view'];
+  $variables['header']['errors'] = ['content' => t('Errors')];
+
+  reposition_array_element($variables['header'], 'id', 3);
+  reposition_array_element($variables['header'], 'errors', 4);
+  reposition_array_element($variables['header'], 'status', 5);
+
+  foreach ($view->result as $item_key => $item) {
+    $count = 0;
+    $errors_count = 0;
+    $test_log = $item->_entity;
+
+    if (!empty($test_log->get('logs')->value)) {
+      $logs_value = $test_log->get('logs')->value;
+      $logs_value = unserialize($logs_value);
+
+      $count = count($test_log->get('logs'));
+
+      if (!empty($test_log->get('logs'))) {
+        foreach ($test_log->get('logs') as $key => $log) {
+          $value = unserialize($log->value);
+          if (!empty($value['type']) && $value['type']->getUntranslatedString() !== 'Success') {
+            $errors_count ++;
+          }
+        }
+      }
+    }
+
+    $variables['rows'][$item_key]['columns']['id']['content'][0]['field_output']['#markup'] = $count > 0 ? $count : t('No redirects yet');
+    $variables['rows'][$item_key]['columns']['errors']['content'][0]['field_output']['#markup'] = $errors_count;
+
+    reposition_array_element($variables['rows'][$item_key]['columns'], 'id', 3);
+    reposition_array_element($variables['rows'][$item_key]['columns'], 'errors', 4);
+    reposition_array_element($variables['rows'][$item_key]['columns'], 'status', 5);
+  }
+}
+
+/**
+ * Move array element by key value to another position by key number.
+ *
+ * @param $array
+ *   array
+ * @param $key
+ *   string
+ * @param $order
+ *   int
+ */
+function reposition_array_element(array &$array, $key, int $order): void {
+  if (!empty($array[$key])) {
+    $a = array_search($key, array_keys($array)) ;
+    $p1 = array_splice($array, $a, 1);
+    $p2 = array_splice($array, 0, $order);
+    $array = array_merge($p2, $p1, $array);
+  }
+}
+
+/**
+ * Implements hook_preprocess_hook().
+ */
+function test_redirect_preprocess_system_modules_details(&$variables) {
+  foreach ($variables['modules'] as $key => $module) {
+    if (strip_tags($module['machine_name']->__toString()) == 'test_redirect') {
+      // Set repeating default options.
+      $options = [
+        'attributes' => [
+          'class' => ['module-link', 'action-link', 'action-link--small'],
+        ]
+      ];
+
+      // Add custom links.
+      $variables['modules'][$key]['links']['configure'] = [
+        'links' => [
+          'list' => [
+            '#type' => 'link',
+            '#title' => t('List'),
+            '#url' => Url::fromRoute('view.test_redirect_statistics.page_1'),
+            '#options' => $options,
+          ],
+          'add' => [
+            '#type' => 'link',
+            '#title' => t('Add'),
+            '#url' => Url::fromRoute('entity.test_redirect.add_form'),
+            '#options' => $options,
+          ],
+          'log' => [
+            '#type' => 'link',
+            '#title' => t('Log'),
+            '#url' => Url::fromRoute('entity.test_log.collection'),
+            '#options' => $options,
+          ],
+        ],
+      ];
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_html() for html templates.
+ */
+function test_redirect_preprocess_html(array &$variables) {
+  $route_name = \Drupal::routeMatch()->getRouteName();
+  switch ($route_name) {
+    case 'entity.test_redirect.canonical':
+      $test_redirect = \Drupal::routeMatch()->getParameter('test_redirect');
+      if ($test_redirect) {
+        $title = $test_redirect->getName();
+        $variables['head_title']['title'] = t('Redirect: @title', ['@title' => $title]);
+      }
+      break;
+
+    case 'entity.test_log.collection':
+      $variables['head_title']['title'] = t('Log');
+      break;
+  }
+}

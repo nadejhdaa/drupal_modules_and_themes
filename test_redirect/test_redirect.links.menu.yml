@@ -1,0 +1,7 @@
+# test log menu items definition
+entity.test_log.collection:
+  title: 'Log'
+  route_name: entity.test_log.collection
+  description: 'List test log entities'
+  parent: view.test_redirect_statistics.page_1
+  weight: 100

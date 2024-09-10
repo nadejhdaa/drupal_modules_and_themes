@@ -1,0 +1,9 @@
+name: 'Test redirects'
+type: module
+description: 'test Redirects Settings Module'
+core_version_requirement: ^9 || ^10
+
+package: 'Custom'
+project: test_redirect
+'interface translation project': test_redirect
+'interface translation server pattern': modules/custom/test/test_redirect/translations/test_redirect.%language.po

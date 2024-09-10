@@ -1,0 +1,9 @@
+services:
+  test_redirect.subscriber:
+    class: Drupal\test_redirect\EventSubscriber\TestRedirectSubscriber
+    arguments: ['@router.request_context', '@path_processor_manager', '@state', '@access_manager', '@current_user', '@router.route_provider', '@http_client', '@testchecker', '@path_alias.manager', '@entity_type.manager']
+    tags:
+      - { name: event_subscriber }
+  testchecker:
+    class: Drupal\test_redirect\TestChecker
+    arguments: ['@entity_type.manager', '@http_client', '@router.request_context', '@current_user', '@state']

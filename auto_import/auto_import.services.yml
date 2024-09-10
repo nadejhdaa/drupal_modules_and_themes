@@ -1,0 +1,62 @@
+services:
+  auto_import.import_contacts:
+    class: Drupal\auto_import\ImportContacts
+    arguments: [
+      '@config.factory',
+      '@entity_type.manager',
+      '@messenger',
+      '@auto_import.client_base',
+      '@auto_content.car_service_service',
+      '@string_translation',
+      '@auto_content.yandex_review_service',
+      '@auto_import.file_service',
+      '@extension.path.resolver',
+      '@simple_sitemap.entity_manager'
+    ]
+
+  auto_import.term_service:
+    class: Drupal\auto_import\TermService
+    arguments: ['@entity_type.manager']
+
+  auto_import.client_base:
+    class: Drupal\auto_import\Client\ClientBase
+    arguments: [
+      '@http_client',
+      '@session',
+      '@url_generator',
+      '@config.factory'
+    ]
+
+  auto_import.file_service:
+    class: Drupal\auto_import\FileService
+    arguments: [
+      '@entity_type.manager',
+      '@auto_import.client_base',
+      '@config.factory',
+      '@file_system',
+      '@file.usage',
+      '@file_url_generator'
+    ]
+
+  auto_import.delete_contacts:
+    class: Drupal\auto_import\DeleteContacts
+    arguments: [
+      '@config.factory',
+      '@entity_type.manager',
+      '@messenger',
+      '@auto_content.car_service_service',
+      '@auto_content.yandex_review_service',
+      '@auto_import.term_service',
+      '@extension.path.resolver'
+    ]
+
+  auto_import.file_delete:
+    class: Drupal\auto_import\DeleteFiles
+    arguments: [
+      '@config.factory',
+      '@entity_type.manager',
+      '@messenger',
+      '@auto_import.file_service',
+      '@file.usage',
+      '@extension.path.resolver'
+    ]

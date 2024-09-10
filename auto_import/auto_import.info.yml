@@ -1,0 +1,8 @@
+name: 'Import contacts module'
+type: module
+description: 'Import content from external sources'
+package: Custom
+core_version_requirement: ^10 || ^11
+dependencies:
+  - simple_sitemap:simple_sitemap
+  - drupal:auto_content

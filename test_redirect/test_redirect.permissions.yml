@@ -1,0 +1,33 @@
+test add redirect entities:
+  title: 'Test: create new redirect entities'
+
+test administer redirect entities:
+  title: 'Test: administer redirect entities'
+  description: 'Allow to access the administration form to configure Test redirect entities.'
+  restrict access: true
+
+test delete redirect entities:
+  title: 'Test: delete redirect entities'
+
+test edit redirect entities:
+  title: 'Test: edit redirect entities'
+
+test view active redirect entities:
+  title: 'Test: view active redirect entities'
+
+test view inactive redirect entities:
+  title: 'Test: view inactive redirect entities'
+
+test view all redirect revisions:
+  title: 'Test: view all redirect revisions'
+
+test revert all redirect revisions:
+  title: 'Test: revert all redirect revisions'
+  description: 'Role requires permission <em>view Test redirect revisions</em> and <em>edit rights</em> for test redirect entities in question or <em>test administer redirect entities</em>.'
+
+test delete all redirect revisions:
+  title: 'Test: Delete all revisions'
+  description: 'Role requires permission to <em>view Test redirect revisions</em> and <em>delete rights</em> for test redirect entities in question or <em>test administer redirect entities</em>.'
+
+test delete log entities:
+  title: 'Test: delete log entities'

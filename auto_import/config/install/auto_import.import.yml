@@ -1,0 +1,7 @@
+base_url: 'http://test.site'
+contact: '/get-contacts'
+contact2: '/get-contacts'
+base_auth_login: 'test'
+base_auth_pass: 'test'
+login: 'test'
+pass: 'test'

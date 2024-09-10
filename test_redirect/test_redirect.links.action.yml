@@ -1,0 +1,5 @@
+entity.test_redirect.add_form:
+  route_name: entity.test_redirect.add_form
+  title: 'Add redirect'
+  appears_on:
+    - view.test_redirect_statistics.page_1

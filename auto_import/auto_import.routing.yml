@@ -1,0 +1,7 @@
+auto_import.import:
+  path: '/admin/structure/import'
+  defaults:
+    _title: 'Import contacts'
+    _form: 'Drupal\auto_import\Form\ImportForm'
+  requirements:
+    _permission: 'access administration pages'

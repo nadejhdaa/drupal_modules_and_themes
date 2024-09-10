@@ -1,0 +1,23 @@
+{#
+/**
+ * @file test_log.html.twig
+ * Default theme implementation to present Test log data.
+ *
+ * This template is used when viewing Test log pages.
+ *
+ *
+ * Available variables:
+ * - content: A list of content items. Use 'content' to print all content, or
+ * - attributes: HTML attributes for the container element.
+ *
+ * @see template_preprocess_test_log()
+ *
+ * @ingroup themeable
+ */
+#}
+<div{{ attributes.addClass('test_log') }}>
+  {% if content %}
+    {{- content -}}
+  {% endif %}
+</div>
+{{ log }}
