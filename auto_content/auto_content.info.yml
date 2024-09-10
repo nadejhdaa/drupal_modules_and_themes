@@ -1,0 +1,8 @@
+name: 'Auto content'
+type: module
+description: 'Intersections, Menus and Terms'
+package: Custom
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:auto_import
+  - drupal:simple_sitemap

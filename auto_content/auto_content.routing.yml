@@ -1,0 +1,7 @@
+auto_content.update_structure:
+  path: '/admin/structure/update-auto'
+  defaults:
+    _title: 'Update Menus and Nodes'
+    _form: 'Drupal\auto_content\Form\UpdateStructureForm'
+  requirements:
+    _permission: 'administer site configuration'

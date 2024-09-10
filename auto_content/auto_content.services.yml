@@ -1,0 +1,65 @@
+services:
+  auto_content.menu_service:
+    class: Drupal\auto_content\MenuService
+    arguments: [
+      '@entity_type.manager',
+      '@auto_import.term_service',
+      '@auto_content.intersection_service',
+      '@plugin.manager.menu.link',
+      '@entity.repository',
+      '@auto_content.menu_link_service',
+      '@entity_display.repository',
+    ]
+
+  auto_content.intersection_service:
+    class: Drupal\auto_content\IntersectionService
+    arguments: [
+      '@entity_type.manager',
+      '@database',
+      '@auto_import.term_service',
+      '@config.factory'
+    ]
+
+  auto_content.update_structure:
+    class: Drupal\auto_content\Update\UpdateStructure
+    arguments: [
+      '@entity_type.manager',
+      '@database',
+      '@transliteration',
+      '@entity.query.sql',
+      '@messenger',
+      '@auto_content.intersection_service',
+      '@auto_content.menu_service',
+      '@auto_import.term_service'
+    ]
+
+  auto_content.menu_link_service:
+    class: Drupal\auto_content\MenuLinkService
+    arguments: [
+      '@entity_type.manager',
+      '@auto_import.term_service',
+      '@auto_content.intersection_service',
+      '@plugin.manager.menu.link',
+      '@entity.repository',
+    ]
+
+  auto_content.car_service_service:
+    class: Drupal\auto_content\CarServiceService
+    arguments: [
+      '@entity_type.manager',
+      '@database',
+      '@auto_import.term_service',
+      '@config.factory',
+      '@file.usage',
+      '@auto_import.file_service',
+      '@geofield.wkt_generator',
+    ]
+
+  auto_content.yandex_review_service:
+    class: Drupal\auto_content\YandexReviewService
+    arguments: [
+      '@entity_type.manager',
+      '@database',
+      '@auto_import.term_service',
+      '@config.factory'
+    ]

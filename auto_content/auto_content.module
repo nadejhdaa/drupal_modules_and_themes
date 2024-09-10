@@ -1,0 +1,258 @@
+<?php
+
+use Drupal\taxonomy\Entity\Term;
+use Drupal\node\NodeInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\file\Entity\File;
+use Drupal\node\Entity\Node;
+use Drupal\path_alias\Entity\PathAlias;
+use Drupal\Component\Transliteration\PhpTransliteration;
+use Drupal\menu_link_content\Entity\MenuLinkContent;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Drupal\Core\Url;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\simple_sitemap\Entity\SimpleSitemapInterface;
+use Drupal\auto_content\Utility\Utility;
+
+/**
+ * @file
+ * Primary module hooks for Auto content module.
+ */
+
+ /**
+ * Implements hook_theme().
+ */
+function auto_content_theme() {
+  return [
+    'accordion_price' => [
+      'variables' => [
+        'data' => [],
+        'title' => 1,
+      ],
+      'template' => 'accordion-price',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_taxonomy_term_insert().
+ */
+function auto_content_taxonomy_term_insert($term) {
+  $vid = $term->bundle();
+  $term_service = \Drupal::service('auto_import.term_service');
+  $menu_link_service = \Drupal::service('auto_content.menu_link_service');
+  $update_structure = \Drupal::service('auto_content.update_structure');
+  $intersection_service = \Drupal::service('auto_content.intersection_service');
+  $menu_service = \Drupal::service('auto_content.menu_service');
+
+  // New Auto term.
+  if ($vid == Utility::VID_BRANDS) {
+    if (empty($term->parent->target_id)) {
+      $update_structure->runTermInsertUpdate($term);
+    }
+    else {
+      $model_node = $intersection_service->handleIntersection($term);
+      $model_link = $menu_service->handleLinkWithNode($model_node, $term);
+    }
+  }
+
+  // New Service term.
+  elseif ($vid == Utility::VID_SERVICES) {
+    $marks = $term_service->getBrands();
+    foreach ($marks as $mark) {
+      $menu_name = Utility::createMenuName($mark);
+      $super_parent_link = $menu_link_service->handleServiceSuperParentLink($mark, $menu_name, $term);
+
+      $node = NULL;
+      if (!empty($term->parent->target_id) && $term->field_not_link->value != '1') {
+        $node = $intersection_service->handleIntersection($mark, $term);
+      }
+
+      if (empty($term->parent->target_id)) {
+        $menu_link = $menu_link_service->handleServiceParentLink($super_parent_link, $mark, $term, $menu_name);
+      }
+      else {
+        $menu_link = $menu_service->checkMenuItem($mark, $term, NULL, $node);
+      }
+    }
+  }
+
+  // New Area term.
+  elseif ($vid == Utility::VID_AREA) {
+    $marks = $term_service->getBrands();
+    foreach ($marks as $mark) {
+      $node = $intersection_service->handleIntersection($mark, NULL, $term);
+      $menu_link = $menu_service->checkMenuItem($mark, NULL, $term, $node);
+    }
+  }
+}
+
+/**
+ * Implements hook_taxonomy_term_predelete().
+ */
+function auto_content_taxonomy_term_predelete($term) {
+  $menu_service = \Drupal::service('auto_content.menu_service');
+  $menu_link_service = \Drupal::service('auto_content.menu_link_service');
+  $intersection_service = \Drupal::service('auto_content.intersection_service');
+  $term_service = \Drupal::service('auto_import.term_service');
+
+  $vid = $term->bundle();
+
+  // Deleted Auto term.
+  if ($vid == Utility::VID_BRANDS) {
+    if (empty($term->parent->target_id)) {
+      $menu_name = Utility::MENU_MAIN_NAME;
+      $mark_nodes = $intersection_service->findIntersectionFromTerm($term);
+
+      // Remove all children links from Main menu.
+      if(!empty($mark_nodes)) {
+        $mark_node = reset($mark_nodes);
+        $mark_link = $menu_link_service->findOneByNode($mark_node);
+        if (!empty($mark_link)) {
+          $mark_uuid = 'menu_link_content:' . $mark_link->uuid();
+
+          $menu_tree = \Drupal::menuTree();
+          $parameters = $menu_tree->getCurrentRouteMenuTreeParameters($menu_name);
+          $tree = $menu_tree->load($menu_name, $parameters);
+
+          if (!empty($tree[$mark_uuid])) {
+            $marka_item = $tree[$mark_uuid];
+            $menu_link_service->deleteLinkItems($marka_item);
+          }
+        }
+
+        foreach ($mark_nodes as $mark_node) {
+          $mark_node->delete();
+        }
+      }
+
+      // Remove created Auto menu.
+      $mark_menu_name = Utility::createMenuName($term);
+      $menu_service->deleteMenu($mark_menu_name);
+    }
+
+    // Remove all associated nodes.
+    $nodes = $intersection_service->findIntersectionFromMark($term);
+    if (!empty($nodes)) {
+      foreach ($nodes as $node) {
+        if (empty($term->parent->target_id)) {
+          $model_link = $menu_link_service->findOneByNode($node);
+          if (!empty($model_link)) {
+            $model_link->delete();
+          }
+        }
+        $node->delete();
+      }
+    }
+  }
+
+  // Deleted Service or Area.
+  elseif ($vid == Utility::VID_AREA || $vid == Utility::VID_SERVICES) {
+    $marks = $term_service->getBrands();
+    foreach ($marks as $mark) {
+      $fields = [
+        'menu_name' => Utility::createMenuName($mark),
+      ];
+      $field_name = $vid == Utility::VID_AREA ? 'field_area' : 'field_service';
+      $fields[$field_name] = $term->id();
+
+      $menu_link = $menu_link_service->findOneByFields($fields);
+
+      if (!empty($menu_link)) {
+        $uri = $menu_link->link->uri;
+        $params = Url::fromUri($uri)->getRouteParameters();
+        if (!empty($params['node'])) {
+          $node = Node::load($params['node']);
+          $node->delete();
+        }
+
+        $menu_link->delete();
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_taxonomy_term_update().
+ */
+function auto_content_taxonomy_term_update(Term $term) {
+  $vid = $term->bundle();
+  $intersection_service = \Drupal::service('auto_content.intersection_service');
+  $menu_link_service = \Drupal::service('auto_content.menu_link_service');
+  $term_service = \Drupal::service('auto_import.term_service');
+
+  // Updated Service term.
+  if ($vid == Utility::VID_SERVICES) {
+    $autos = $term_service->getBrands();
+    foreach ($autos as $auto) {
+      $fields = [
+        'menu_name' => Utility::createMenuName($auto),
+        'field_service' => $term->id(),
+      ];
+
+      $menu_link = $menu_link_service->findOneByFields($fields);
+
+      if (!empty($menu_link)) {
+        $uri = $menu_link->link->uri;
+        $params = Url::fromUri($uri)->getRouteParameters();
+        if (!empty($params['node'])) {
+          $node = Node::load($params['node']);
+          $node = $intersection_service->updateIntersectionFromTerms($node, $auto, $term);
+        }
+
+        $properties = [
+          'title' => Utility::getMenuLinkTitle($term),
+          'description' => $term->getName(),
+        ];
+        $menu_link = $menu_link_service->updateLink($menu_link, $properties);
+      }
+    }
+  }
+  // Updated Auto term.
+  elseif ($vid == Utility::VID_BRANDS) {
+    $original = $term->original;
+    $fields = [
+      'menu_name' => Utility::MENU_MAIN_NAME,
+      'title' => $original->getName(),
+      'parent' => !empty($term->parent->target_id) ? Term::load($term->parent->target_id) : NULL,
+    ];
+
+    $menu_link = $menu_link_service->findOneByFields($fields);
+
+    if (!empty($menu_link)) {
+      $uri = $menu_link->link->uri;
+      $params = Url::fromUri($uri)->getRouteParameters();
+      if (!empty($params['node'])) {
+        $node = Node::load($params['node']);
+        $node = $intersection_service->updateIntersectionFromTerms($node, $term);
+      }
+      $properties = [
+        'title' => $term->getName(),
+        'description' => $term->getName(),
+      ];
+      $menu_link = $menu_link_service->updateLink($menu_link, $properties);
+    }
+  }
+  // Updated Area term.
+  elseif ($vid == Utility::VID_AREA) {
+    $original = $term->original;
+
+    $marks = $term_service->getBrands();
+    foreach ($marks as $mark) {
+      $node = $intersection_service->handleIntersection($mark, NULL, $term);
+      if (!empty($node)) {
+        $menu_link = $menu_link_service->findOneByNode($node);
+        if (!empty($menu_link)) {
+          $properties = [
+            'description' => Utility::createAreaTitle($mark, $term),
+            'title' => mb_strtoupper($term->getName()),
+          ];
+          $menu_link = $menu_link_service->updateLink($menu_link, $properties);
+        }
+        else {
+          $menu_link = $menu_link_service->createMenuLinkForNode($node);
+        }
+      }
+    }
+  }
+}
