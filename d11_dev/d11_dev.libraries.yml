@@ -1,0 +1,8 @@
+kint:
+  version: 0
+  css:
+    theme:
+      assets/kint/original.css: { minified: true }
+  js:
+    assets/kint/shared.js: { tag: noscript }
+    assets/kint/rich.js: { tag: noscript }

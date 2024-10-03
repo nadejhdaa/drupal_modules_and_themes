@@ -1,0 +1,7 @@
+name: 'ENC dev'
+type: module
+description: 'Some dev functions'
+package: Custom
+core_version_requirement: ^10 || ^11
+dependencies:
+  - devel:devel

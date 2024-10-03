@@ -1,0 +1,12 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for enc_dev module.
+ */
+function enc_dev_preprocess_page(&$variables) {
+  $moduleHandler = \Drupal::service('module_handler');
+  if ($moduleHandler->moduleExists('devel')) {
+    $variables['#attached']['library'][] = 'enc_dev/kint';
+  }
+}
