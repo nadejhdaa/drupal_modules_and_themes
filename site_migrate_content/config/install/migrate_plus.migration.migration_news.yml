@@ -1,0 +1,149 @@
+langcode: ru
+status: true
+dependencies:
+  enforced:
+    module:
+      - migrate_source_csv
+      - site_migrate_content
+      - domain_access
+id: migration_news
+class: null
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+migration_group: enc
+label: 'News CSV Migrate'
+source:
+  plugin: csv
+  header_offset: 0
+  enclosure: '`'
+  delimiter: "|"
+  path: /news.csv
+  ids:
+    - nid
+process:
+  nid: nid
+  uid:
+    plugin: default_value
+    default_value: 1
+  type:
+    plugin: default_value
+    default_value: news
+  field_remote_id: nid
+  title: title
+  created: created
+  changed: changed
+  status: status
+  promote: promote
+  field_news_type:
+    plugin: static_map
+    source: type
+    map:
+      news: for_patients
+      news_specialists: for_specialists
+  field_hide_on_list:
+    plugin: node_process
+    node_type: news
+    source:
+      - field_newsspec_cover
+      - type
+      - field_newsspec_section
+  field_hide_on_list_str:
+    plugin: concat
+    source:
+      - type
+
+  field_doc_tofront: field_doc_tofront
+  body/value:
+    source: body
+    plugin: body_with_imgs
+  body/format:
+    -
+      plugin: static_map
+      source: body_format
+      map:
+        full_html: full_html
+        php_code: fallback
+        noindex_exlinks: fallback
+        token: fallback
+        html_mail: fallback
+        image_resize_nolink: fallback
+        plain_text: plain_text
+        filtered_html: basic_html
+    -
+      plugin: default_value
+      default_value: full_html
+  field_migrate_attention:
+    plugin: static_map
+    source: body_format
+    map:
+      full_html: "0"
+      php_code: "1"
+      noindex_exlinks: "1"
+      token: "1"
+      html_mail: "1"
+      image_resize_nolink: "1"
+      plain_text: "0"
+      filtered_html: "0"
+
+  field_migrate_comment:
+    plugin: node_process
+    source: body_format
+
+  field_cover/target_id:
+    -
+      plugin: media_generate
+      destination_bundle: image
+      source: field_newsspec_cover
+      destination_field: field_media_image
+    -
+      plugin: skip_on_empty
+      method: process
+      message: 'field_cover empty'
+
+  field_image/target_id:
+    -
+      source: field_image
+      plugin: media_generate
+      destination_bundle: image
+      destination_field: field_media_image
+      source_field_name: field_image
+    -
+      plugin: skip_on_empty
+      method: process
+      message: 'field_cover empty'
+  field_tags:
+    plugin: term_generate
+    destination_bundle: tags
+    source: field_tags
+    delimiter: ';'
+  field_news_section:
+    plugin: term_generate
+    destination_bundle: news_events
+    source: field_newsspec_section
+    delimiter: ';'
+  field_news_date:
+    source: field_newsspec_date
+    plugin: node_process
+  path/alias: alias
+  path/pathauto:
+    plugin: default_value
+    default_value: false
+  redirect:
+    source: redirect
+    plugin: node_process
+  sitemap:
+    source: sitemap
+    plugin: node_process
+  field_meta_tags:
+    source: metatags
+    plugin: node_process
+  field_domain_all_affiliates:
+    source: field_domain_all_affiliates
+    plugin: node_process
+  field_domain_access:
+    source: field_domain_access
+    plugin: node_process
+destination:
+  plugin: entity:node

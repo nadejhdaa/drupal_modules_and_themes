@@ -1,0 +1,17 @@
+<?php
+
+
+/**
+  * Implements hook_ENTITY_TYPE_delete().
+  */
+function site_migrate_content_node_delete(Drupal\Core\Entity\EntityInterface $node) {
+  if ($node->bundle() == 'news') {
+    $id = $node->id();
+    // Remove redirects.
+    redirect_entity_delete($node);
+
+    $node_news_service = \Drupal::service('node_news_service');
+    $node_news_service->removeNodeFiles($node);
+
+  }
+}

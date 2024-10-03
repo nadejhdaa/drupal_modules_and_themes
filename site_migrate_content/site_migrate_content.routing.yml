@@ -1,0 +1,7 @@
+site_migrate_content.import_news:
+  path: '/admin/config/development/import'
+  defaults:
+    _title: 'Import News'
+    _form: 'Drupal\site_migrate_content\Form\ImportNewsForm'
+  requirements:
+    _permission: 'access administration pages'

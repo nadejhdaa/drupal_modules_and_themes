@@ -1,0 +1,8 @@
+site_migrate_content.import_news:
+  title: 'Import news'
+  route_name: enc_migrate_content.import_news
+  parent: system.admin_config_development
+  description: 'Import News from old site'
+  menu_name: admin
+  enabled: 1
+  weight: 8
