@@ -1,0 +1,42 @@
+{#
+/**
+ * @file
+ * Default theme implementation to display tabs layout.
+ *
+ * Available variables:
+ * - content: The content for this layout.
+ * - attributes: HTML attributes for the layout wrapper.
+ *
+ * @ingroup themeable
+ */
+#}
+{% if content %}
+
+  {# @DCG Drupal naming convention for CSS classes in layouts seems weird. Feel free to change it. #}
+  {%
+    set classes = [
+      'layout',
+    ]
+  %}
+
+
+  <div{{ attributes.addClass(classes) }}>
+    {% if content.title %}
+      <div {{ region_attributes.title.addClass('layout__region', 'layout__region--title') }}>
+        {{ content.title }}
+      </div>
+    {% endif %}
+
+    <div class="layout__region">
+      {% for tab_key, item in content | children(true) %}
+        {% if tab_key != 'title' %}
+          <div {{ region_attributes[tab_key].addClass('layout__region') }}>
+            {{ item }}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+  </div>
+
+{% endif %}

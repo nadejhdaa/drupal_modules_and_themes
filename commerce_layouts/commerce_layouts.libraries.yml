@@ -1,0 +1,4 @@
+tabs:
+  css:
+    component:
+      layouts/tabs/tabs.css: {}

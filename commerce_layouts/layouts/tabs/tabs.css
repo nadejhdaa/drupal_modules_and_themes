@@ -1,0 +1,28 @@
+.layout--tabs {
+  display: flex;
+  gap:  1rem;
+  padding: 1rem;
+  outline: solid 1px orange;
+}
+
+.layout--tabs > .layout__region {
+  padding: 1rem;
+  outline: solid 1px orange;
+}
+
+.layout--tabs > .layout__region--main {
+  flex-basis: 66%;
+}
+
+.layout--tabs > .layout__region--sidebar {
+  flex-basis: 33%;
+}
+
+@media all and (max-width: 850px) {
+  .layout--tabs {
+    flex-direction: column;
+  }
+  .layout--tabs > .layout__region {
+    flex-basis: auto;
+  }
+}

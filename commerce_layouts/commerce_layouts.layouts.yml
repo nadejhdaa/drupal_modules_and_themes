@@ -1,0 +1,15 @@
+commerce_layouts_tabs:
+  label: 'Tabs'
+  category: 'Custom'
+  path: layouts/tabs
+  template: tabs
+  library: commerce_layouts/tabs
+  icon_map:
+    - [title]
+  regions:
+    title:
+      label: Title
+
+    # tabs:
+    #   label: Tabs
+  class: Drupal\commerce_layouts\Plugin\Layout\Tabset
