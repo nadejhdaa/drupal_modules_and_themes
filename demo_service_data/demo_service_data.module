@@ -1,0 +1,35 @@
+<?php
+
+use \Drupal\Core\Queue\QueueFactory;
+
+/**
+ * @file
+ * Update service "pu", "pu1" and "du" from MIS.
+ */
+
+/**
+ * Implements hook_cron().
+ */
+function demo_service_data_cron() {
+  $interval = 60 * 60 * 3;
+  $next_execution = \Drupal::state()->get('demo_service_data_cron.next_execution', 0);
+  $request_time = \Drupal::time()->getRequestTime();
+
+  if ($request_time >= $next_execution) {
+    \Drupal::state()->set('demo_service_data_cron.next_execution', $request_time + $interval);
+
+    $end = time() + 90;
+    $demo_client = \Drupal::service('demo_client');
+    $result = $demo_client->getData();
+
+    if (!empty($result)) {
+      $queue = \Drupal::queue('demo_service_data_mis_services_updater');
+
+      foreach ($result as $data) {
+        if (time() < $end) {
+          $queue->createItem($data);
+        }
+      }
+    }
+  }
+}

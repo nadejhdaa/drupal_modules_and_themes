@@ -1,0 +1,4 @@
+services:
+  demo_service_data.service_data_manager:
+    class: Drupal\demo_service_data\ServiceDataManager
+    arguments: ['@entity_type.manager']
