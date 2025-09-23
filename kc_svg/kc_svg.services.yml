@@ -1,0 +1,5 @@
+services:
+  kc_svg.twig.extension:
+    class: Drupal\kc_svg\TwigExtension\KcSvg
+    tags:
+      - { name: twig.extension }

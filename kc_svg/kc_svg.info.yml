@@ -1,0 +1,5 @@
+name: 'kc_svg'
+type: module
+description: 'Functions to render svg in twig'
+package: Custom
+core_version_requirement: ^10 || ^11
