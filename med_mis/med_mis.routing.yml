@@ -1,0 +1,31 @@
+med_mis.mis_settings:
+  path: '/admin/mis'
+  defaults:
+    _title: 'MIS debug settings'
+    _form: 'Drupal\med_mis\Form\MisDebugSettingsForm'
+  requirements:
+    _permission: 'administer site configuration'
+
+med_mis.mis_connection_settings:
+  path: '/admin/mis/connection-settings'
+  defaults:
+    _form: '\Drupal\med_mis\Form\MisSettingsForm'
+    _title: 'MIS connection settings'
+  requirements:
+    _permission: 'administer site configuration'
+
+med_mis.slot_filter_settings:
+  path: '/admin/mis/slot-filter-settings'
+  defaults:
+    _title: 'Slot filter settings'
+    _form: 'Drupal\med_mis\Form\SlotFilterSettingsForm'
+  requirements:
+    _permission: 'administer site configuration'
+
+med_mis.get_doctor_days_ajax:
+  path: '/ajax-get-doctor-days'
+  defaults:
+    _title: 'Get Doctor Days Ajax'
+    _controller: '\Drupal\med_mis\Controller\GetDoctorDaysAjaxController'
+  requirements:
+    _permission: 'access content'

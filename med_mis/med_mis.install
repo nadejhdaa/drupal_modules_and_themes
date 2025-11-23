@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * @file
+ * Create mis database tables.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function med_mis_schema() {
+  $schema['med_mis_debug_users'] = [
+    'description' => 'The table for storing the user information',
+    'fields' => [
+      'id' => [
+        'description' => 'Primary identifier for data',
+        'type' => 'serial',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ],
+      'email' => [
+        'description' => 'User email',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'ip' => [
+        'description' => 'User IP',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+    ],
+    'primary key' => ['id'],
+  ];
+
+  return $schema;
+}

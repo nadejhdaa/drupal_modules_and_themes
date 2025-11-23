@@ -1,0 +1,14 @@
+med_mis.mis_settings:
+  title: Debug settings
+  route_name: med_mis.mis_settings
+  base_route: med_mis.mis_settings
+
+med_mis.mis_connection_settings:
+  title: Connection settings
+  route_name: med_mis.mis_connection_settings
+  base_route: med_mis.mis_settings
+
+med_mis.slot_filter_settings:
+  title: Slot filter settings
+  route_name: med_mis.slot_filter_settings
+  base_route: med_mis.mis_settings
