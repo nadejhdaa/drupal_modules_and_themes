@@ -1,0 +1,17 @@
+{{ form.form_build_id }}
+{{ form.form_token }}
+{{ form.form_id }}
+
+
+{{ form.tab }}
+
+{{ form|without('tab', 'specialist_filters', 'service_filters', 'actions', 'selected_services', 'selected_doctors') }}
+
+{{ form.specialist_filters }}
+{{ form.service_filters }}
+
+
+{{ form.actions }}
+
+{{ form.selected_services }}
+{{ form.selected_doctors }}

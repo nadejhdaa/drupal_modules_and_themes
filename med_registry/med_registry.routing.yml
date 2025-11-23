@@ -1,0 +1,53 @@
+enc_registry.registry:
+  path: '/registry'
+  defaults:
+    _title: 'Make an appointment'
+    _form: 'Drupal\enc_registry\Form\RegistryForm'
+  requirements:
+    _role: anonymous+administrator
+
+enc_registry.specialist_fio_autocomplete:
+  path: '/enc-specialist-fio-autocomplete'
+  defaults:
+    _controller: 'Drupal\enc_registry\Controller\DoctorFioAutocomplete::autocomplete'
+    _format: json
+  requirements:
+    _permission: 'access content'
+
+enc_registry.service_title_autocomplete:
+  path: '/enc-service-title-autocomplete'
+  defaults:
+    _controller: 'Drupal\enc_registry\Controller\ServiceTitleAutocomplete::autocomplete'
+    _format: json
+  requirements:
+    _permission: 'access content'
+
+enc_registry.select_service_ajax_link_response:
+  path: '/enc-select-service-response'
+  defaults:
+    _controller: 'Drupal\enc_registry\Controller\AjaxLinkResponseController::selectService'
+  requirements:
+    _permission: 'access content'
+
+enc_registry.clear_form_ajax_link_response:
+  path: '/clear-form-ajax-link-response'
+  defaults:
+    _controller: 'Drupal\enc_registry\Controller\AjaxLinkResponseController::clearForm'
+  requirements:
+    _permission: 'access content'
+
+enc_registry.get_slots_service:
+  path: '/enc-mis-data-get-service-closest-time'
+  defaults:
+    _title: 'Get Slots By Services'
+    _controller: 'Drupal\enc_registry\Controller\GetClosestSlotController::getClosestSlot'
+  requirements:
+    _permission: 'access content'
+
+enc_registry.load_doctor_cart_form:
+  path: '/ajax-load-doctor-cart-form'
+  defaults:
+    _title: 'Ajax load doctor cart form'
+    _controller: '\Drupal\enc_registry\Controller\AjaxLoadDoctorCartFormController'
+  requirements:
+    _permission: 'access content'

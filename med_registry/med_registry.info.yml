@@ -1,0 +1,7 @@
+name: 'MED Registry'
+type: module
+description: 'ENC registry functions'
+package: Custom
+core_version_requirement: ^10 || ^11
+interface translation project: med_registry
+interface translation server pattern: modules/custom/med_registry/translations/med_registry.%language.po

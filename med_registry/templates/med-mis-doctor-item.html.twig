@@ -1,0 +1,71 @@
+<div class="doctor-item__wrapper" data-specialist="{{ doctor_item.specialist }}" data-closest-date="{{ doctor_item.closest_day }}" {% if doctor_item.selected_service %}data-selected-service="{{ doctor_item.selected_service }}"{% endif %}>
+
+  <div class="d-flex">
+    <div class="">
+      <img src="{{ doctor_item.img }}"/>
+
+      {% if doctor_item.nid %}
+        <a href="{{ path('entity.node.canonical', {'node': doctor_item.nid}) }}">{{ 'About a doctor'|t }}</a>
+        <div>
+          <a href="{{ path('enc_registry.load_doctor_cart_form', {}, { 'query': { 'nid': doctor_item.nid, 'service': doctor_item.service_with_slot } }) }}" class="use-ajax">{{ 'Select'|t }}</a>
+        </div>
+
+      {% else %}
+
+        {% if doctor_item.specialist %}
+          <div>
+            <a href="{{ path('enc_registry.load_doctor_cart_form', {}, {'query': { 'specialist': doctor_item.specialist, 'service': doctor_item.selected_service }}) }}" class="use-ajax">{{ 'Select'|t }}</a>
+          </div>
+        {% endif %}
+
+      {% endif %}
+    </div>
+
+    <div class="">
+      <div class="">
+        <h4>{{ doctor_item.fio }}</h4>
+        {{ doctor_item.specialist }}
+
+        <div>
+          {{ doctor_item.post|join(',') }}
+        </div>
+
+        <div>
+          {{ doctor_item.specialty|join(',') }}
+        </div>
+
+        <div>
+          {{ doctor_item.regalia|join(',') }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex" >
+
+      <div class="specialist-closest-day-info {{ doctor_item.closest_day is empty ? 'hidden' : '' }}">
+
+        <span class="specialist-closest-label">{{ 'Nearest apoint is on'|t }}:</span>
+
+        <strong>
+          <span class="specialist-closest-date">
+            {% if doctor_item.closest_day is not empty %}
+              {{ doctor_item.closest_day|format_date('custom', 'd F, l') }}
+            {% endif %}
+          </span>
+
+          <span class="specialist-closest-time">
+            {% if doctor_item.closest_time is not empty %}
+              {{ doctor_item.closest_time }}
+            {% endif %}
+          </span>
+        </strong>
+      </div>
+
+
+
+      <div class="specialist-no-days {{ doctor_item.closest_day is empty ? '' : 'hidden' }}">{{ 'There are no available dates for appointment' | t }}</div>
+
+
+  </div>
+</div>

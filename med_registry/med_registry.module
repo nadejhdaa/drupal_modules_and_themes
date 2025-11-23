@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for ENC Registry module.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function enc_registry_theme($existing, $type, $theme, $path) {
+  return [
+    'registry_form' => [
+      'render element' => 'form',
+    ],
+
+    'enc_mis_service_item' => [
+      'variables' => [
+        'service_item' => [],
+        'selected' => TRUE,
+      ],
+    ],
+
+    'enc_mis_doctor_item' => [
+      'variables' => [
+        'doctor_item' => [],
+      ],
+    ],
+
+    'enc_mis_service_items' => [
+      'variables' => [
+        'services_links' => [],
+      ],
+    ],
+  ];
+}

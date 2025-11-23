@@ -1,0 +1,51 @@
+<div class="d-flex">
+  <div>
+    <div>
+      <div>
+        {{ service_item['title'] }} {% if service_item.closest_date is not empty %}closest_date = {{ service_item.closest_date }}{% endif %}
+      </div>
+      <div>
+        {{ service_item['@Pr.Duv'] }}
+      </div>
+    </div>
+
+    <div class="d-flex">
+      <div>
+        {{ 'Cost: from'|t }} <span>{{ service_item['@XHMr7tar'] }}</span> ₽
+      </div>
+
+      <div data-service="{{ service_item.value }}" {% if service_item.closest_date is not empty %}data-closest-date="{{ service_item.closest_date }}{% endif %}">
+        <div class="service-closest-day-info {{ service_item.closest_date is empty ? 'hidden' : '' }}">
+
+          <span class="service-closest-label">{{ 'Nearest apoint is on'|t }}:</span>
+
+          <strong>
+            <span class="service-closest-date">
+              {% if service_item.closest_date is not empty %}
+                {{ service_item.closest_date|format_date('custom', 'd F, l') }}
+              {% endif %}
+            </span>
+
+            <span class="service-closest-time"></span>
+          </strong>
+        </div>
+      </div>
+
+      {% if not selected %}
+        <div class="">
+          <a href="{{ path('enc_registry.select_service_ajax_link_response', { 'service': service_item.value }) }}" class="use-ajax">
+            {{ 'Select'|t }}
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if selected %}
+    <div>
+      <a href="{{ path('enc_registry.clear_form_ajax_link_response') }}" class="use-ajax">
+        {{ 'Reset'|t }}
+      </a>
+    </div>
+  {% endif %}
+</div>

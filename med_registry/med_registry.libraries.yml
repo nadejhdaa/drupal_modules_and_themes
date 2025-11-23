@@ -1,0 +1,41 @@
+registry_form:
+  js:
+    js/registry_form.js: {}
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupalSettings
+    - core/drupal.ajax
+    - core/drupal.dialog.ajax
+    - med_registry/litepicker
+
+litepicker:
+  js:
+    js/litepicker.js: {}
+  css:
+    component:
+      css/date_range_picker.css: {}
+
+add_time_to_services_ajax_command:
+  version: VERSION
+  js:
+    # Add JS files
+    js/add_time_to_services_ajax_command.js: {}
+  dependencies:
+    - core/drupal.ajax
+    - core/jquery
+    - core/once
+    - core/drupal
+    - core/drupalSettings
+
+set_url_params_ajax_command:
+  version: VERSION
+  js:
+    # Add JS files
+    js/set_url_params_ajax_command.js: {}
+  dependencies:
+    - core/drupal.ajax
+    - core/jquery
+    - core/once
+    - core/drupal
+    - core/drupalSettings
