@@ -1,0 +1,51 @@
+{{ form.form_build_id }}
+{{ form.form_token }}
+{{ form.form_id }}
+
+<div class="doctor-cart-form-dialog-msg"></div>
+
+<h3>{{ form.fio_item }}</h3>
+
+<div style="display: flex; gap: 30px;">
+
+  <div class="doc-col-1" style="min-width: 220px;">
+    <img src="{{ file_url(img) }}" style="max-width: 100%;" />
+
+    <div class="nearest-appointment-info">
+      {% if form.date %}
+        {{ 'Nearest appointment date and time:'|t }}
+        <div class="nearest-appointment-date-time">
+          {{ form.nearest_date_time }}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="doc-col-2">
+    <div class="service-info" style="display: flex; gap: 1rem; align-items: center;">
+
+      <div class="service-select">
+        {{ form.service }}
+      </div>
+      <div class="service-price">
+        {{ form.price_markup }}
+      </div>
+    </div>
+    {{ form.slot_address }}
+    <div class="service-date-time" style="display: flex; gap: 1rem; ">
+      <div class="service-date-picker">
+        {{ form.date }}
+        {{ form.date_datepicker }}
+      </div>
+
+      <div class="service-time-picker">
+        {{ form.time_display }}
+        {{ form.time_timepicker }}
+        {{ form.actions }}
+      </div>
+    </div>
+
+    {{ form|without('available_title', 'service', 'price_markup', 'date', 'date_datepicker', 'time_display', 'time_timepicker', 'nearest_date_time', 'actions') }}
+  </div>
+
+</div>

@@ -1,0 +1,8 @@
+<a href="{{ user_authenticated ? path('med_cart.cart_authenticated') : path('enc_cart.cart_anonymous') }}">
+  {{ 'Cart'|t }}
+  <span class="count {% if count > 0 %}count--positive{% endif %}">
+    {% if count > 0 %}
+      {{ count }}
+    {% endif %}
+  </span>
+</a>

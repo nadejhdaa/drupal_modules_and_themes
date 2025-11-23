@@ -1,0 +1,44 @@
+{{ form.form_build_id }}
+{{ form.form_token }}
+{{ form.form_id }}
+
+
+<div class="row" style="display: flex; gap: 30px;">
+
+  <div class="col cart__main-content" style="min-width: 66%;">
+
+    {% if form.items %}
+      {{ form.search }}
+
+      {{ form.selected_items }}
+
+      <div class="cart__items">
+        {{ form.prepare_info }}
+        {{ form.items }}
+      </div>
+    {% else %}
+      <div class="cart__empty">
+        {{ form.empty }}
+      </div>
+    {% endif %}
+
+    {{ form|without('items', 'actions', 'count', 'total', 'types', 'prepare_info', 'empty', 'search', 'selected_items') }}
+  </div>
+
+  <div class="col cart__right-col">
+    <div class="cart__right-col__content">
+      {{ form.types }}
+
+      <div>
+        <div>
+          {{ form.count }}
+        </div>
+        <div>
+          {{ form.total }}
+        </div>
+      {{ form.actions }}
+      </div>
+    </div>
+  </div>
+
+</div>

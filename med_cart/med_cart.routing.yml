@@ -1,0 +1,77 @@
+med_cart.doctor_appointment:
+  path: '/doctor-appointment-form'
+  defaults:
+    _title: 'Doctor Appointment'
+    _form: 'Drupal\med_cart\Form\DoctorCartForm'
+  requirements:
+    _permission: 'access content'
+
+med_cart.doctor_appointment_select_time:
+  path: '/ajax/doctor-appointment-select-time/{qqc244to}/{time}'
+  defaults:
+    _title: 'User selected time link'
+    _controller: '\Drupal\med_cart\Controller\AjaxLinkController::selectTimeAjaxResponse'
+
+med_cart.load_request_form:
+  path: '/ajax/load-request-form'
+  defaults:
+    _title: 'Start Js function'
+    _controller: '\Drupal\med_cart\Controller\AjaxWebformController::loadRequestForm'
+  requirements:
+    _permission: 'access content'
+
+med_cart.filter_days_by_month:
+  path: '/filter-days-by-month/{specialist}/{service}'
+  defaults:
+    _title: 'Filter Days By Month'
+    _controller: '\Drupal\med_cart\Controller\FilterDaysByMonth'
+  requirements:
+    _permission: 'access content'
+
+med_cart.cart_anonymous:
+  path: '/cart'
+  defaults:
+    _title: 'Cart'
+    _form: 'Drupal\med_cart\Form\AnonymousCartForm'
+  requirements:
+    _role: 'anonymous'
+
+med_cart.cart_authenticated:
+  path: '/user/cart'
+  defaults:
+    _title: 'Cart'
+    _form: 'Drupal\med_cart\Form\UserCartForm'
+  requirements:
+    _role: esia_authenticated+administrator
+
+med_cart.checkout_anonymous:
+  path: '/checkout'
+  defaults:
+    _title: 'Checkout'
+    _controller: '\Drupal\med_cart\Controller\CheckoutPageAnonymous'
+  requirements:
+    _role: 'anonymous'
+
+med_cart.cart_delete:
+  path: '/med-delete-cart-item'
+  defaults:
+    _title: 'Delete items from cart'
+    _controller: 'Drupal\med_cart\Controller\DeleteCartController::deleteCartItem'
+  requirements:
+    _permission: 'access content'
+
+med_cart.add_cart_item:
+  path: '/med-add-cart-item'
+  defaults:
+    _title: 'Add item to cart'
+    _controller: 'Drupal\med_cart\Controller\AddToCartController::addCartItem'
+  requirements:
+    _permission: 'access content'
+
+med_cart.cart_service_search_autocomplete:
+  path: '/cart-service-search-autocomplete'
+  defaults:
+    _controller: 'Drupal\med_cart\Controller\CartServiceSearchAutocomplete::autocomplete'
+    _format: json
+  requirements:
+    _permission: 'access content'

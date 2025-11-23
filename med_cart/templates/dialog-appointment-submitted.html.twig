@@ -1,0 +1,13 @@
+<div>{{ msg|nl2br }}</div>
+
+{% if type == 'success' %}
+
+  {{ slot.service }}
+  {{ 'Doctor'|t }}: {{ slot.pAz }}
+  {{ 'Service'|t }}: {{ slot.title }}
+  {{ 'Appointment time'|t }}: {{ slot.date }} {{ slot.time }}
+  {{ slot.price }}
+
+{% else %}
+  {{ slot.service }}
+{% endif %}

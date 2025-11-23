@@ -1,0 +1,244 @@
+<?php
+
+/**
+ * @file
+ * The med_cart module functions.
+ */
+
+use Drupal\node\Entity\Node;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\med_mis\Utility\Utility;
+
+/**
+ * Implements hook_theme().
+ */
+function med_cart_theme($existing, $type, $theme, $path) {
+  return [
+    'doctor_cart_form' => [
+      'render element' => 'form',
+    ],
+    'service_price' => [
+      'variables' => [
+        'price' => '',
+        'label' => '',
+        'value' => '',
+        'service' => '',
+      ],
+    ],
+    'med_timepicker' => [
+      'variables' => [
+        'slots' => [],
+        'date' => '',
+      ],
+    ],
+    'cart_block_top' => [
+      'variables' => [
+        'count' => '',
+        'user_authenticated' => '',
+      ],
+    ],
+    'appointment_form' => [
+      'render element' => 'form',
+    ],
+    'dialog_appointment' => [
+      'variables' => [
+        'params' => [],
+      ],
+    ],
+    'cart_form' => [
+      'render element' => 'form',
+    ],
+    'dialog_add_to_cart' => [
+      'variables' => [
+        'slot' => [],
+        'type' => '',
+        'additional_slot' => [],
+      ],
+    ],
+    'dialog_appointment_submitted' => [
+      'variables' => [
+        'slot' => '',
+        'msg' => '',
+        'type' => '',
+      ],
+    ],
+    'no_days_msg' => [
+      'variables' => [
+        'url' => NULL,
+        'service' => '',
+      ],
+    ],
+    'med_cart_services_list_item' => [
+      'variables' => [
+        'service' => [],
+      ],
+    ],
+    'cart_item' => [
+      'variables' => [
+        'slot' => [],
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_form_id().
+ */
+function med_cart_preprocess_doctor_cart_form(&$variables) {
+  $nid = !empty($variables['form']['nid']['#value']) ? $variables['form']['nid']['#value'] : '';
+  if (!empty($nid)) {
+    $node = Node::load($nid);
+    $doctor_service = \Drupal::service('doctor_service');
+    $img = $doctor_service->getDocImg($node);
+    $variables['img'] = $img;
+    $variables['specialist'] = !$node->get('field_doc_mis_code')->isEmpty() ? $node->field_doc_mis_code->value : '';
+  }
+  else {
+    $request = \Drupal::request();
+    $variables['specialist'] = $request->get('specialist');
+  }
+
+  $variables['is_doctor_node'] = \Drupal::routeMatch()->getRouteName() == 'entity.node.canonical' ? TRUE : FALSE;
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function med_cart_preprocess_page(&$variables) {
+  $variables['#attached']['library'][] = 'core/drupal.ajax';
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function med_cart_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == 'webform_submission_' . Utility::WEBFORM_ORDER . '_add_form') {
+    $form['actions']['submit']['#submit'][] = 'med_cart_clear_cart';
+    $form['actions']['submit']['#validate'][] = 'med_cart_zayavka_form_validate';
+    $form['#attached']['library'][] = 'med_cart/request_webform';
+  }
+}
+
+/**
+ * Clear cart for anonymous user.
+ */
+function med_cart_clear_cart($form, FormStateInterface $form_state) {
+  $cartManager = Drupal::service('med_cart.cart_manager');
+  $cartManager->clearCart();
+}
+
+/**
+ * Validate cart function.
+ */
+function med_cart_zayavka_form_validate($form, FormStateInterface $form_state) {
+  $cartManager = Drupal::service('med_cart.cart_manager');
+  $cart_items = $cartManager->cartItems();
+
+  if (!empty($cart_items)) {
+    foreach ($cart_items as $cart_item) {
+      if (!empty($cart_item['time'])) {
+        $cart_item_info = [
+          $cart_item['info'],
+          $cart_item['pAz'],
+          $cart_item['title'],
+        ];
+      }
+      else {
+        $cart_item_info = [
+          $cart_item['code'],
+          $cart_item['title'],
+          $cart_item['date'],
+        ];
+      }
+
+      $items[] = implode('. ', $cart_item_info);
+    }
+
+    $services_build = [
+      '#theme' => 'item_list',
+      '#items' => $items,
+    ];
+
+    $form_state->setValue('services', \Drupal::service('renderer')->render($services_build));
+  }
+}
+
+/**
+ * Implements hook_preprocess_node().
+ */
+function med_cart_preprocess_node__doctor(&$variables) {
+  $slot = FALSE;
+
+  $node = $variables['node'];
+
+  $request = \Drupal::request();
+  $specialist = $request->get('specialist');
+  $service = $request->get('service');
+
+  if (empty($specialist) && $node->hasField('field_doc_mis_code') && !$node->get('field_doc_mis_code')->isEmpty()) {
+    $specialist = $node->field_doc_mis_code->value;
+  }
+
+  if (!empty($specialist)) {
+    $tomorrow = date('Y-m-d', strtotime('tomorrow'));
+
+    $db = \Drupal::database();
+    $query = $db->select('med_mis_doctors_days', 'd');
+    $query->innerJoin('med_mis_doctors_days__data', 'dd', 'd.id = dd.entity_id');
+    $query->condition('d.specialist', $specialist);
+    $query->condition('dd.data_date', $tomorrow, '>=');
+    $query->fields('dd', ['data_service', 'data_date']);
+    $query->orderBy('dd.data_date', 'DESC');
+
+    if (!empty($service)) {
+      $query->condition('dd.data_service', $service);
+    }
+
+    $result = $query->execute()->fetchAllAssoc('data_service');
+
+    if (!empty($result)) {
+      foreach ($result as $service_code => $data) {
+        $service_date = date('d.m.Y', strtotime($data->data_date));
+        $items[$service_date] = $service_code;
+      }
+
+      ksort($items);
+
+      $date = array_key_first($items);
+      $service = $items[$date];
+
+      $params = [
+        'specialist' => $specialist,
+        'service' => $service,
+      ];
+
+      $cid = Utility::buildCidString(__FUNCTION__, $params);
+
+      if ($cache = \Drupal::cache()->get($cid)) {
+        $slot = $cache->data;
+      }
+      else {
+        if (!empty($date)) {
+          $params['date'] = date('Ymd', strtotime($date));
+
+          $mis_client = Drupal::service('mis_client');
+          $result = $mis_client->getSlotsToAppoint($params);
+
+          if (!empty($result['slots'][$date]['slot'])) {
+            $slot = reset($result['slots'][$date]['slot']);
+
+            $expiration = time() + Utility::DOC_SLOTS_CACHE_TIME;
+            \Drupal::cache()->set($cid, $slot, $expiration);
+          }
+        }
+      }
+    }
+
+    // If doctor has a slot.
+    if (!empty($slot)) {
+      $variables['registry_price'] = $slot['price'];
+      $variables['registry_date'] = $slot['date'];
+      $variables['registry_time'] = $slot['time'];
+    }
+  }
+}

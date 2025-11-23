@@ -1,0 +1,24 @@
+{{ slot.date }}med
+{{ slot.time }}
+
+{{ slot.title }}
+{{ slot.price }}
+{{ slot.qqc244to }} {{ slot.service }}
+
+<a href="{{ slot.url }}">{{ slot.pAz }}</a>
+
+{% set query = { 'service': slot.service|url_encode } %}
+
+{% if slot.date %}
+  {% set query = query|merge({ 'date' : slot.date }) %}
+{% endif %}
+
+{% if slot.time %}
+  {% set query = query|merge({ 'time' : slot.time }) %}
+{% endif %}
+
+{% if slot.qqc244to %}
+  {% set query = query|merge({ 'specialist' : slot.qqc244to|url_encode }) %}
+{% endif %}
+
+<a href="{{ path('enc_cart.cart_delete', {}, { 'query': query }) }}" class="use-ajax">{{ 'Delete'|t }}</a>

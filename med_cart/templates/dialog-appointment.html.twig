@@ -1,0 +1,56 @@
+<div class="appointment-dialog">
+  <div>
+    <span>{{ 'Specialist'|t }}:</span> <span>{{ params.fio }}</span>
+  </div>
+
+  <div>
+    {% if params.slot %}
+      <span>{{ 'Service'|t }}:</span> <span>{{ params.slot.title }}</span>
+    {% endif %}
+  </div>
+
+  <div>
+    {% if params.slot %}
+      <span>{{ 'Date'|t }}:</span> <span>{{ params.slot.date }}</span>
+    {% endif %}
+  </div>
+
+  <div>
+    {% if params.slot %}
+      {% set time_arr = params.slot.time|split('-') %}
+      {% set time = time_arr[0] %}
+      <span>{{ 'Time'|t }}:</span> <span>{{ time }}</span>
+    {% endif %}
+  </div>
+
+
+  <div>
+    {% if params.slot %}
+      <span>{{ 'Price'|t }}:</span> <span>{{ params.slot.price|number_format(0, '.', ' ') }} ₽</span>
+    {% endif %}
+  </div>
+
+{% if params.user_is_logged_in is empty %}
+  <div>
+    <div class="attention">
+      {{ 'To register for the schedule and pay for the service, you must log in to your personal account.'|t }}
+    </div>
+
+    <a href="#" target="_blank">{{ 'Login to your personal account via ESIA'|t }}</a>
+  </div>
+
+  <div>
+    <div class="attention">
+      {{ 'Without authorization, you can only leave a request and wait for the operator to call'|t }}
+    </div>
+
+    <a href="#" data-ajax-url="/ajax/load-request-form" class="use-ajax">{{ 'Leave a request'|t }}</a>
+
+  </div>
+
+{% else %}
+  user_is_logged_in
+
+{% endif %}
+
+</div>

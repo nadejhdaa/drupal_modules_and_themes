@@ -1,0 +1,47 @@
+<div>{{ msg|nl2br }}</div>
+
+<div class="text-center">
+  {% if type == 'success' %}
+    <div>{{ slot.title }}</div>
+    <div>{{ 'Doctor'|t }}: {{ slot.pAz }}</div>
+    <div>{{ 'Appointment time'|t }}: {{ slot.date }} {{ slot.time }}</div>
+
+    {% if slot.address %}
+      <div>{{ 'Address'|t }}: {{ slot.address }}</div>
+    {% endif %}
+
+    <div>{{ 'Price'|t }}: {{ slot.price }} руб.</div>
+
+    {% if additional_slot %}
+      {{ '"@service_title" has been automatically added to your cart'|t({'@service_title' : additional_slot.title}) }}
+    {% endif %}
+
+    <div>
+      <a href="{{ path('med_registry.registry', {query: { tab: 'specialist', specialist: slot.qqc244to }}) }}" class="btn">
+        {{ 'To select the services of this specialist' | t }}
+      </a>
+    </div>
+
+    <div>
+      <a href="{{ path('enc_registry.registry') }}" class="btn">
+        {{ 'To select all services'|t }}
+      </a>
+    </div>
+
+    <div>
+      <a href="{{ path('enc_cart.cart_authenticated') }}" class="btn">
+        {{ 'Go to cart'|t }}
+      </a>
+    </div>
+
+    <div>
+      {{ 'Please note!<br>
+        To register for services in the Cart, you must <a href="@cart_url">complete the order</a>.<br>
+        Registration for unregistered services is not possible.' | t({'@cart_url': path('enc_cart.cart_authenticated')})
+      }}
+    </div>
+
+  {% else %}
+    {{ slot.service }}
+  {% endif %}
+</div>

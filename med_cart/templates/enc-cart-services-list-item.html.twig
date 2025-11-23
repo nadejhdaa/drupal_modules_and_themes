@@ -1,0 +1,20 @@
+<div class="row">
+  <div class="col">
+    {{ service.title }}
+
+    {{ service.code }}
+  </div>
+  <div class="col">
+    {{ service.price|number_format(0, ',', ' ') }} р.
+  </div>
+
+  <div class="col services-list__item__add-link">
+    {% if service.item_id %}
+      <a href="{{ path('med_cart.cart_delete', {'item_id': service.item_id}) }}" class="use-ajax button">{{ 'Remove'|t }}</a>
+    {% else %}
+      <a href="{{ path('med_cart.add_cart_item', {'id': service.id}) }}" class="use-ajax button">{{ 'Add'|t }}</a>
+    {% endif %}
+
+  </div>
+</div>
+med

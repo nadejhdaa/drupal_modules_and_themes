@@ -1,0 +1,12 @@
+<div class="doctor-timepicker-wrapper">
+  {% if slots %}
+    {% for slot in slots %}
+      <span>
+        {% set start_time = slot.type1860 == 'queue' ? slot.time : slot.time|split('-')[0] %}
+        <a class="time-slot use-ajax" data-slot="{{ slot.qqc244to }}-{{ start_time }}" data-ajax-url="/ajax/doctor-appointment-select-time/{{ slot.qqc244to|url_encode }}/{{ slot.time|url_encode }}" href="#">
+          {{ start_time }}
+        </a>
+      </span>
+    {% endfor %}
+  {% endif %}
+</div>

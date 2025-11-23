@@ -1,0 +1,52 @@
+# Custom library for general purposes.
+doctor_cart_form:
+  js:
+    js/doctor_cart_form.js: {}
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupalSettings
+    - jquery_ui_datepicker/datepicker
+    - core/drupal.ajax
+    - core/drupal.dialog.ajax
+
+request_webform:
+  js:
+    js/request_webform.js: {}
+  dependencies:
+    - core/jquery
+    - core/once
+
+appointment_dialog:
+  js:
+    js/appointment_dialog.js: {}
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupalSettings
+    - core/drupal.ajax
+    - core/drupal.dialog.ajax
+
+upd_webform_ajax_command:
+  version: VERSION
+  js:
+    # Add JS files
+    js/upd_webform_ajax_command.js: {}
+  dependencies:
+    - core/drupal.ajax
+    - core/jquery
+    - core/once
+    - core/drupal
+    - core/drupalSettings
+
+add_params_to_url_ajax_command:
+  version: VERSION
+  js:
+    # Add JS files
+    js/add_params_to_url_ajax_command.js: {}
+  dependencies:
+    - core/drupal.ajax
+    - core/jquery
+    - core/once
+    - core/drupal
+    - core/drupalSettings

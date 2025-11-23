@@ -1,0 +1,10 @@
+name: 'ENC cart'
+type: module
+description: 'ENC slots and add to cart functions'
+package: Custom
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:enc_content
+  - drupal:enc_mis
+interface translation project: enc_cart
+interface translation server pattern: modules/custom/enc_cart/translations/enc_cart.%language.po

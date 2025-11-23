@@ -1,0 +1,26 @@
+services:
+  med_cart.cart_manager:
+    class: Drupal\med_cart\CartManager
+    arguments: [
+      '@entity_type.manager',
+      '@current_user',
+      '@session',
+      '@messenger',
+      # '@mis_data',
+      '@cache.default',
+      # '@mis_client'
+    ]
+
+  med_cart.slot_manager:
+    class: Drupal\med_cart\SlotManager
+    arguments: [
+     # '@mis_data',
+     '@current_user',
+     '@session']
+
+  med_cart.service_manager:
+    class: Drupal\med_cart\ServiceManager
+    arguments: [
+     '@mis_client',
+     '@med_service.med_mis_service_helper'
+    ]
