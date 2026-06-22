@@ -1,0 +1,3 @@
+administer demo_entity_and_queue:
+  title: 'Administer service data'
+  restrict access: true

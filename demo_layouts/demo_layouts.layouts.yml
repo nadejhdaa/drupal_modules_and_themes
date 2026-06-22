@@ -1,0 +1,15 @@
+demo_layouts_tabs:
+  label: 'Tabs'
+  category: 'Custom'
+  path: layouts/tabs
+  template: tabs
+  library: demo_layouts/tabs
+  icon_map:
+    - [title]
+  regions:
+    title:
+      label: Title
+
+    # tabs:
+    #   label: Tabs
+  class: Drupal\demo_layouts\Plugin\Layout\Tabset

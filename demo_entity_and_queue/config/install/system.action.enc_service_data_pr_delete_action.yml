@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - demo_entity_and_queue
+id: demo_entity_and_queue_delete_action
+label: 'Delete enc service data from getprs'
+type: demo_entity_and_queue
+plugin: entity:delete_action:demo_entity_and_queue
+configuration: {  }

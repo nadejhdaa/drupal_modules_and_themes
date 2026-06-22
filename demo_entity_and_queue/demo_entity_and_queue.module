@@ -1,0 +1,47 @@
+<?php
+
+use \Drupal\Core\Queue\QueueFactory;
+
+/**
+ * @file
+ * Update service "pu", "pu1" and "du" from MIS.
+ */
+
+/**
+ * Implements hook_cron().
+ */
+function demo_entity_and_queue_cron() {
+  $interval = 60 * 60 * 24;
+  $next_execution = \Drupal::state()->get('demo_entity_and_queue_cron.next_execution', 0);
+  $request_time = \Drupal::time()->getRequestTime();
+
+  $now = date('H');
+  $min = '02:00';
+  $max = 5;
+
+  if ($request_time >= $next_execution && $now < $max && _enc_mis_check_time_is_later_than($min)) {
+    \Drupal::logger('demo_entity_and_queue_cron')->debug('Started getPr demo_entity_and_queue_cron');
+    \Drupal::state()->set('demo_entity_and_queue_cron.next_execution', $request_time + $interval);
+
+    $end = time() + 90;
+    $mis_client = \Drupal::service('mis_client');
+    $result = $mis_client->getPr();
+
+    if (!empty($result['sections'])) {
+      $queue = \Drupal::queue('demo_entity_and_queue_updater');
+
+      foreach ($result['sections'] as $section) {
+        if (!empty($section['rows'])) {
+          $i = 0;
+          foreach ($section['rows'] as $row) {
+            if (time() < $end) {
+              $queue->createItem($row);
+              $i++;
+            }
+          }
+          \Drupal::logger('demo_entity_and_queue_cron')->debug('Stopped getPr demo_entity_and_queue_cron. Created ' . $i . ' "demo_entity_and_queue_updater" queue items.');
+        }
+      }
+    }
+  }
+}

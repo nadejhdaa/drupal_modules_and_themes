@@ -1,7 +1,0 @@
-name: 'MED MIS'
-type: module
-description: 'ENC getting data from MIS'
-package: Custom
-core_version_requirement: ^10 || ^11
-interface translation project: med_mis
-interface translation server pattern: modules/custom/med_mis/translations/med_mis.%language.po

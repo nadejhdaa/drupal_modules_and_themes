@@ -1,0 +1,5 @@
+name: 'Store services data in DemoEntity'
+type: module
+description: 'Custom entities to store services data'
+package: '@todo Add package'
+core_version_requirement: ^10 || ^11

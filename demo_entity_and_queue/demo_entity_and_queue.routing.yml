@@ -1,0 +1,7 @@
+entity.demo_entity_and_queue.settings:
+  path: 'admin/structure/demo-service-data-pr'
+  defaults:
+    _form: '\Drupal\demo_entity_and_queue\Form\DemoEntitySettingsForm'
+    _title: 'Enc service data from remote service'
+  requirements:
+    _permission: 'administer demo_entity_and_queue'

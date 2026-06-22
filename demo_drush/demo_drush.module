@@ -1,0 +1,76 @@
+<?php
+
+use Drupal\Component\Serialization\Json;
+
+/**
+ * @file
+ * Primary module hooks for ЭНЦ добмен данными с МИС module.
+ */
+
+/**
+  * Implements hook_cron().
+  */
+function demo_drush_cron() {
+  $interval = 60 * 60 * 24 * 7;
+  $next_execution = \Drupal::state()->get('demo_drush_cron.holidays_next_execution', 0);
+  $request_time = \Drupal::time()->getRequestTime();
+
+  $date_string = '06:30';
+  if ($request_time >= $next_execution && _demo_drush_check_time_is_later_than($date_string)) {
+    \Drupal::state()->set('demo_drush_cron.holidays_next_execution', $request_time + $interval);
+
+    $holidays = _demo_drush_get_holidays();
+
+    if (!empty($holidays)) {
+      \Drupal::state()->set('demo_holidays', $holidays);
+    }
+  }
+}
+
+/**
+ * Get production calendar of russia.
+ */
+function _demo_drush_get_holidays() {
+  $holidays = [];
+  $year = date('Y');
+
+  $url = "https://xmlcalendar.ru/data/ru/{$year}/calendar.json";
+
+  $response = \Drupal::httpClient()->get($url);
+  $response_body = $response->getBody();
+  $result = Json::decode($response_body);
+
+  foreach($result['months'] as $month) {
+    $month_num = $month['month'] < 10 ? '0' . $month['month'] : $month['month'];
+    $month_days = explode(',', $month['days']);
+
+    foreach($month_days as $day) {
+      $day = intval($day);
+      $day = $day < 10 ? '0' . $day : $day;
+
+      $holidays[] = date('Y-m-d', strtotime($year . '-' . $month_num . '-' .  $day));
+    }
+  }
+
+  return $holidays;
+}
+
+/**
+ * Check if current time is later than string.
+ */
+function _demo_drush_check_time_is_later_than($date_string = '') {
+  if (empty($date_string)) {
+    return FALSE;
+  }
+  else {
+    $now = new DateTime();
+    $cutoff = new DateTime($date_string);
+
+    if ($now > $cutoff) {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+  }
+}

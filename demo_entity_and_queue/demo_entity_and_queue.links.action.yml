@@ -1,0 +1,5 @@
+demo_entity_and_queue.add_form:
+  title: 'Add enc service data'
+  route_name: entity.demo_entity_and_queue.add_form
+  appears_on:
+    - entity.demo_entity_and_queue.collection

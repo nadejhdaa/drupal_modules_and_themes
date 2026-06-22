@@ -1,0 +1,5 @@
+name: 'Demo layouts'
+type: module
+description: 'Demo layouts'
+package: Custom
+core_version_requirement: ^10 || ^11

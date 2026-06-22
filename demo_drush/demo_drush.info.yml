@@ -1,0 +1,7 @@
+name: 'demo MIS'
+type: module
+description: 'demo getting data from MIS'
+package: Custom
+core_version_requirement: ^10 || ^11
+interface translation project: demo_mis
+interface translation server pattern: modules/custom/demo_mis/translations/demo_mis.%language.po

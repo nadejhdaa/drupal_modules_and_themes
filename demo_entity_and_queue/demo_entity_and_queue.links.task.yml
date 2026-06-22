@@ -1,0 +1,9 @@
+entity.demo_entity_and_queue.settings:
+  title: 'Settings'
+  route_name: entity.demo_entity_and_queue.settings
+  base_route: entity.demo_entity_and_queue.settings
+entity.demo_entity_and_queue.collection:
+  title: 'Enc service data from getPrs'
+  route_name: entity.demo_entity_and_queue.collection
+  base_route: system.admin_content
+  weight: 10

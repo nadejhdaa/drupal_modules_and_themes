@@ -1,0 +1,11 @@
+entity.demo_entity_and_queue.settings:
+  title: 'Enc service data from getPr'
+  description: 'Configure an Enc service data from getPr entity type.'
+  route_name:  entity.demo_entity_and_queue.settings
+  parent: system.admin_structure
+
+entity.demo_entity_and_queue.collection:
+  title: 'Enc service data from getPrs'
+  description: 'List of enc service data from getprs.'
+  route_name: entity.demo_entity_and_queue.collection
+  parent: system.admin_content

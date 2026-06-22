@@ -1,0 +1,5 @@
+services:
+  demo_drush.commands:
+    class: \Drupal\demo_drush\Drush\Commands\demoQueueProcessCommand
+    tags:
+      - { name: drush.command }
