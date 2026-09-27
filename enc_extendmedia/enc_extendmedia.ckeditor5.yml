@@ -1,0 +1,15 @@
+enc_extendmedia_media_link:
+  provider: enc_extendmedia
+  ckeditor5:
+    plugins:
+      - enc_extendmedia.MediaLinkButton
+    config:
+      drupalMedia:
+        toolbar:
+          - 'mediaLinkButton'
+  drupal:
+    label: 'Media link button'
+    library: enc_extendmedia/media_link_button
+    elements: false
+    conditions:
+      plugins: [media_media, ckeditor5_link]

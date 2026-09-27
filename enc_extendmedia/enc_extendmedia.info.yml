@@ -1,0 +1,5 @@
+name: 'ЭНЦ Media'
+type: module
+description: 'Функционал для Media'
+package: Custom
+core_version_requirement: ^10 || ^11

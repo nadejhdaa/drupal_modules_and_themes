@@ -1,0 +1,5 @@
+media_link_button:
+  js:
+    js/media_link_button.js: {}
+  dependencies:
+    - core/ckeditor5
